@@ -1,68 +1,19 @@
+''' QUite useless script, the only important part is the rotation, should be done in a separate script / function actually!
+
+'''
+
+
 import PIL
-from sklearn import decomposition,cluster
+
 import numpy as np
 import glob
 import cPickle
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
 import os
 from shutil import copyfile
 from skimage.feature import greycomatrix, greycoprops
 from imfractal import *
-from skimage import exposure
-from scipy import ndimage as ndi
-from skimage.filters import gabor_kernel
 
-
-def predictImageFromKmeans(k_means,image,size=(256,256)):
-    imarray = np.array(image)
-    all_r =imarray[:,:,0].flatten()
-    all_g =imarray[:,:,1].flatten() 
-    all_b  = imarray[:,:,2].flatten() 
-    X = np.vstack((all_r,all_g,all_b)).T
-    newImage = k_means.predict(X)
-    greyImage = 0.299*imarray[:,:,0] + 0.587 *imarray[:,:,1] + 0.114 * imarray[:,:,2]
-    img_adapteq = exposure.equalize_hist(greyImage)
-    image_grey_corr = (img_adapteq*255)
-
-
-    return newImage.astype('int'),image_grey_corr
-
-def GetImageFromKMeansAndArray(array,k_means,size=(256,256)):
-    array = array.astype('int')
-    values = k_means.cluster_centers_.squeeze()
-    image_compressed = values[array].astype('uint8')
-    image_compressed.shape = (size[0],size[1],3)
-    test_image = PIL.Image.fromarray(image_compressed)
-    return test_image
-    
-def compute_feats(image, kernels):
-        feats = np.zeros((len(kernels), 2), dtype=np.double)
-        for k, kernel in enumerate(kernels):
-            filtered = ndi.convolve(image, kernel, mode='wrap')
-            feats[k, 0] = filtered.mean()
-            feats[k, 1] = filtered.var()
-        return feats    
-        
-def GetFeaturesGaborFilters(image,kernels):
-    # image here is a gray-scaled image
-    
-    # prepare features
-    ref_feats = np.zeros(( len(kernels), 2), dtype=np.double)
-    ref_feats[:, :] = compute_feats(image, kernels)
-
-    return ref_feats
-    
-def GetKernels(frqs =(0.05,0.1, 0.25,0.5),thetas = [0,0.5,0.75]):
-    kernels = []
-    thetas = np.array(thetas)*np.pi
-    for theta in thetas:
-      
-        for frequency in frqs:
-                kernel = np.real(gabor_kernel(frequency, theta=theta))
-                kernels.append(kernel)
-    return kernels
-    
+from MiscFunctionsSkymatics import *
 class_name = 'WhiteSpots'
 base = '/home/geoanton/SkyMaticsLearning/FarmLabeledForTraining'
 parent_dir = '%s/%s/' % (base,class_name)
@@ -74,6 +25,7 @@ if not(os.path.exists(new_folder)):
 list_im = glob.glob(parent_dir + '*.png')
 angles = [90,180,270,360]
 i=0
+# Here I save the copies of the initial images, but rotated by angle in angles:
 for image_file in list_im:
     image = PIL.Image.open(image_file)
     name=class_name + '%04d' % i
@@ -82,20 +34,26 @@ for image_file in list_im:
         print '%d out of %d' %(i,len(list_im))
         image.rotate(alpha).save(new_folder+'%s_%d.%s' %(name,alpha,ext))
     i+=1
+
     
+    
+    
+# At this point now I go into the new_folder, and analyze images there treating each one as independent observation:
 
 list_im = glob.glob(new_folder + '*.png')
 # Set up fractal functions:
 ins = MFS()
-
 ins.setDef(1,10,3)
 # For GLCM
 pixs = [2,4,8,16]
 angles = [0, np.pi/4, np.pi/2, 3*np.pi/4]
+
 # for Gabor filters:
 frqs = (0.1,0.5,1)
 kernels = GetKernels(frqs)
-
+# This flag controls whether I have to re-build the feature sets or not.
+# Rebuilding is an expensive procedure, although I get to re-run the script often sometimes. So make sure to set it to True when you 
+# need to get the features, otherwise set it to False.
 reread_Hists=True
 if reread_Hists:
     with open('kmeansadlee.pkl', 'rb') as fid:

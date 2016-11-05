@@ -1,37 +1,20 @@
+''' Unsupervised clustering from the whole feature space 
+
+This script helps labeling the images and sorting them into the folders for future supervised learning 
+
+'''
+
 import PIL
 from sklearn import decomposition,cluster
 import numpy as np
 import glob
 import cPickle
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 import os
-from sklearn import decomposition
 from shutil import copyfile
 from skimage.feature import greycomatrix, greycoprops
 from imfractal import *
-
-def predictImageFromKmeans(k_means,image,size=(256,256)):
-    imarray = np.array(image)
-    all_r =imarray[:,:,0].flatten()
-    all_g =imarray[:,:,1].flatten() 
-    all_b  = imarray[:,:,2].flatten() 
-    X = np.vstack((all_r,all_g,all_b)).T
-    newImage = k_means.predict(X)
-    greyImage = 0.299*imarray[:,:,0] + 0.587 *imarray[:,:,1] + 0.114 * imarray[:,:,2]
-    #values = k_means.cluster_centers_.squeeze()
-    return newImage.astype('int'),greyImage
-    #values = np.round(values).astype('int')
-    #image_compressed = values[newImage].astype('uint8')
-    #image_compressed.shape = (size[0],size[1],3)
-def GetImageFromKMeansAndArray(array,k_means,size=(256,256)):
-    array = array.astype('int')
-    values = k_means.cluster_centers_.squeeze()
-    image_compressed = values[array].astype('uint8')
-    image_compressed.shape = (size[0],size[1],3)
-    test_image = PIL.Image.fromarray(image_compressed)
-    return test_image
-    
+from MiscFunctionsSkymatics import *
     
     
 parent_dir = './images_all/'

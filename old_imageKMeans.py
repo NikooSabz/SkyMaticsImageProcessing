@@ -1,3 +1,6 @@
+''' Out-dated script'''
+
+
 import PIL
 import glob
 from sklearn import decomposition,cluster

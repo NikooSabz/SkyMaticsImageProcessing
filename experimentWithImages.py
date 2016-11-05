@@ -1,3 +1,7 @@
+''' Script to play with the images, experimental purpose only
+Can be the right place to test a few ideas etc in terms of new features to pick etc...
+'''
+
 from __future__ import print_function
 
 import PIL

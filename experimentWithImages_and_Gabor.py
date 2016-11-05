@@ -1,5 +1,8 @@
 from __future__ import print_function
 
+'''Script for experimenting purposes. Good place to test some ideas etc.'''
+
+
 import PIL
 import matplotlib.pyplot as plt
 import numpy as np

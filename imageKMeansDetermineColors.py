@@ -1,3 +1,15 @@
+''' This script picks the dictionary of the colors from the pictures sitting in the parent_dir folder
+
+Be careful, since the indexing of the colors changes as you re-run the k-means due to the random implementation.
+Therefore, I recommend running it at the very beginning of your analysis and saving (as I do) the k-means dictionary into an object
+on the HDD - as in line 49 I do with cPickle. From then on, for any function that requires the k-means, load the object and pass it
+without re-running the script. 
+
+As the database of different images grows, we might want to introduce more variability into colors and re-run the script.
+
+'''
+
+
 import PIL
 import glob
 from sklearn import decomposition,cluster
@@ -5,7 +17,13 @@ import numpy as np
 import cPickle
 import matplotlib.pyplot as plt
 
+
+# Number of colors to consider:
+    
 n_clusters = 60
+
+
+
 parent_dir = './images/'
 images_list =  glob.glob(parent_dir + '*.png')
 ind = range(len(images_list))
