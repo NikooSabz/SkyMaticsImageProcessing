@@ -11,4 +11,17 @@ Nov 5:
 We need to start a Google Drive account / Dropbox account so we could also store the images for each classifier, without rebuilding them all the time.
 With the next commit I will add the comments into each file and explain what the file purpose is.
 
-Stay tuned!
+
+if GDAL2Tiles.py does not work out of the box, consider remapping from latlong to UTM and then running!!!
+
+Ex. :
+ gdalwarp -s_srs '+proj=latlong +zone=12 +datum=WGS84' -t_srs '+proj=utm +zone=12 +datum=WGS84' CanolaJune29.tif CanolaJune29UTM2.tif
+
+
+
+Now when the images are tiled, I can analyze them on the scale of 1 tile.
+Example usage :
+
+
+gdal2tiles.py -s adlee15GBPRJ.prj adlee15GB.tif ./adlee15GB 
+
